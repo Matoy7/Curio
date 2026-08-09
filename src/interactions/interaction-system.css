@@ -1,0 +1,373 @@
+/* ===========================================================================
+   INTERACTION SYSTEM
+   ---------------------------------------------------------------------------
+   One consistent interaction language for the whole site.
+
+   This file only ever styles :hover, :active, :focus-visible and
+   :focus-within. At rest, every element renders exactly as the Figma design
+   specifies — no colour, size, spacing, type or position is altered.
+
+   Colours used here are taken from the design itself:
+     #2d415f / #e8f5f9  the design's own "selected pill" variant
+     #2a7ea7            the design's link/accent blue
+     #12243e            the design's ink
+
+   Roles are applied at runtime by useInteractionLayer.ts as data-ix="…".
+   =========================================================================== */
+
+:root {
+  /* Motion — fast and decisive, never bouncy */
+  --ix-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ix-dur: 200ms;
+  --ix-dur-press: 90ms;
+  --ix-dur-media: 520ms;
+
+  /* Displacement */
+  --ix-lift: -2px;
+  --ix-lift-card: -4px;
+  --ix-press: 0.97;
+
+  /* Design tokens */
+  --ix-ink: #12243e;
+  --ix-fill: #2d415f;
+  --ix-on-fill: #e8f5f9;
+  --ix-accent: #2a7ea7;
+
+  /* Elevation + focus */
+  --ix-shadow: 0 6px 18px -6px rgba(18, 36, 62, 0.28);
+  --ix-shadow-card: 0 16px 32px -14px rgba(18, 36, 62, 0.32);
+  --ix-ring: 0 0 0 3px rgba(42, 126, 167, 0.45);
+}
+
+/* ---------- Base: shared by every interactive element ---------------------- */
+
+[data-ix] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    transform var(--ix-dur) var(--ix-ease),
+    box-shadow var(--ix-dur) var(--ix-ease),
+    background-color var(--ix-dur) var(--ix-ease),
+    filter var(--ix-dur) var(--ix-ease);
+}
+
+/* Press is always faster than hover — this is what makes it feel responsive */
+[data-ix]:active {
+  transition-duration: var(--ix-dur-press);
+}
+
+/* One focus treatment everywhere. Keyboard only, so mouse users never see it. */
+[data-ix]:focus-visible {
+  outline: none;
+  box-shadow: var(--ix-ring);
+}
+
+/* Text inside an interactive element should never be accidentally selected
+   while double-clicking a control. */
+[data-ix="button"],
+[data-ix="pill"],
+[data-ix="icon"],
+[data-ix="fab"] {
+  user-select: none;
+}
+
+/* ---------- Role: link  (nav items, footer links, "View all") ------------- */
+
+[data-ix="link"] {
+  position: relative;
+}
+
+/* Several links (notably in the footer) are full-column-width rows wrapping a
+   much narrower text node. Restricting pointer events to the children makes
+   the hover target the text itself rather than the whole row. :hover still
+   propagates up to the tagged element, so the styling below is unaffected. */
+[data-ix="link"] {
+  pointer-events: none;
+}
+
+[data-ix="link"] > * {
+  pointer-events: auto;
+}
+
+/* The underline tracks the real text baseline, so it works regardless of the
+   line-height the design uses.
+
+   :not([data-ix-underlined]) is essential — the footer's legal links are
+   underlined in the design, and an unscoped rule here would overwrite that
+   decoration and silently delete it from the page. */
+[data-ix="link"]:not([data-ix-underlined]) p {
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+  transition:
+    text-decoration-color var(--ix-dur) var(--ix-ease),
+    opacity var(--ix-dur) var(--ix-ease);
+}
+
+[data-ix="link"]:not([data-ix-underlined]):hover p {
+  text-decoration-color: currentColor;
+}
+
+/* Links that already carry a underline express hover through the lift alone,
+   which is the shared signal across the whole system. */
+[data-ix="link"][data-ix-underlined] p {
+  transition: opacity var(--ix-dur) var(--ix-ease);
+}
+
+[data-ix="link"]:hover {
+  transform: translateY(-1px);
+}
+
+[data-ix="link"]:active {
+  transform: translateY(0);
+  opacity: 0.7;
+}
+
+/* Struck-through prices must not gain a hover underline */
+[data-ix="link"] p.line-through {
+  text-decoration-line: line-through;
+}
+
+/* ---------- Role: pill  (age, category and "Add" outlined buttons) -------- */
+
+/* Hover adopts the design's own selected-variant colours. */
+[data-ix="pill"]:hover {
+  background-color: var(--ix-fill);
+  transform: translateY(var(--ix-lift));
+  box-shadow: var(--ix-shadow);
+}
+
+[data-ix="pill"]:hover p {
+  color: var(--ix-on-fill);
+}
+
+[data-ix="pill"] p {
+  transition: color var(--ix-dur) var(--ix-ease);
+}
+
+[data-ix="pill"]:active {
+  transform: translateY(0) scale(var(--ix-press));
+  box-shadow: none;
+}
+
+/* ---------- Role: button  (filled CTAs — Shop Now, Subscribe) ------------- */
+
+[data-ix="button"]:hover {
+  transform: translateY(var(--ix-lift));
+  box-shadow: var(--ix-shadow);
+}
+
+[data-ix="button"]:active {
+  transform: translateY(0) scale(var(--ix-press));
+  box-shadow: none;
+}
+
+/* ---------- Role: icon  (logo, search, cart, wishlist heart) -------------- */
+
+[data-ix="icon"]:hover {
+  transform: scale(1.08);
+}
+
+[data-ix="icon"]:active {
+  transform: scale(0.92);
+}
+
+/* The logo is physically larger, so it needs a smaller multiplier to read as
+   the same amount of movement. */
+[data-ix="icon"][data-ix-size="lg"]:hover {
+  transform: scale(1.03) translateY(-1px);
+}
+
+[data-ix="icon"][data-ix-size="lg"]:active {
+  transform: scale(0.99);
+}
+
+/* The cart badge is decorative and must travel with the cart it belongs to. */
+[data-ix-badge] {
+  pointer-events: none;
+  transition: transform var(--ix-dur) var(--ix-ease);
+}
+
+[data-ix="icon"]:hover ~ [data-ix-badge] {
+  transform: scale(1.08);
+}
+
+[data-ix="icon"]:active ~ [data-ix-badge] {
+  transform: scale(0.92);
+  transition-duration: var(--ix-dur-press);
+}
+
+/* ---------- Role: card  (product, age and category cards) ----------------- */
+
+[data-ix="card"]:hover {
+  transform: translateY(var(--ix-lift-card));
+  box-shadow: var(--ix-shadow-card);
+}
+
+[data-ix="card"]:active {
+  transform: translateY(-1px) scale(0.995);
+  box-shadow: var(--ix-shadow);
+}
+
+/* Category tiles have no card radius of their own — a rectangular shadow
+   behind their rounded artwork would read as a mistake, so they lift only. */
+[data-ix="card"][data-ix-flat]:hover,
+[data-ix="card"][data-ix-flat]:active {
+  box-shadow: none;
+}
+
+/* Slow, quiet image push-in. Much slower than the card lift so it reads as
+   depth rather than as a second animation. */
+[data-ix-media] {
+  overflow: hidden;
+}
+
+[data-ix-media] img {
+  transition: transform var(--ix-dur-media) var(--ix-ease);
+}
+
+[data-ix="card"]:hover [data-ix-media] img {
+  transform: scale(1.035);
+}
+
+/* A card's own pill lights up with the card, without needing its own hover. */
+[data-ix="card"]:hover [data-ix="pill"] {
+  background-color: var(--ix-fill);
+  transform: none;
+  box-shadow: none;
+}
+
+[data-ix="card"]:hover [data-ix="pill"] p {
+  color: var(--ix-on-fill);
+}
+
+/* Nested controls keep their own press feedback but never double-lift.
+   These selectors must also restate :active — they out-specify the plain
+   [data-ix="pill"]:active rule, so without this the press would be swallowed
+   by the hover rule for every control that sits inside a card. */
+[data-ix="card"] [data-ix="pill"]:hover,
+[data-ix="card"] [data-ix="button"]:hover {
+  transform: translateY(var(--ix-lift));
+}
+
+[data-ix="card"] [data-ix="pill"]:active,
+[data-ix="card"] [data-ix="button"]:active {
+  transform: translateY(0) scale(var(--ix-press));
+  box-shadow: none;
+}
+
+/* ---------- Role: arrow  ("View all" chevron) ----------------------------- */
+
+[data-ix-arrow] {
+  transition: transform var(--ix-dur) var(--ix-ease);
+}
+
+[data-ix="link"]:hover [data-ix-arrow],
+[data-ix="button"]:hover [data-ix-arrow] {
+  transform: translateX(3px);
+}
+
+/* ---------- Role: field  (newsletter email input) ------------------------- */
+
+[data-ix="field"] {
+  transition:
+    box-shadow var(--ix-dur) var(--ix-ease),
+    transform var(--ix-dur) var(--ix-ease);
+}
+
+[data-ix="field"]:hover {
+  box-shadow: var(--ix-shadow);
+}
+
+[data-ix="field"]:focus-within {
+  box-shadow: var(--ix-ring);
+}
+
+/* The input carries the exact class list of the <p> it replaced, so font,
+   size, weight, colour and leading all come from the design. This rule only
+   strips the browser's default input chrome — it deliberately does NOT set
+   font or colour, which would override those inherited design classes. */
+.ix-input {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  text-align: center;
+}
+
+/* The placeholder IS the design's original text, so it keeps full opacity
+   until the user types. */
+.ix-input::placeholder {
+  color: var(--ix-ink);
+  opacity: 1;
+  transition: opacity 140ms var(--ix-ease);
+}
+
+.ix-input:focus::placeholder {
+  opacity: 0.45;
+}
+
+/* ---------- Role: fab  (floating AI agent) -------------------------------- */
+
+/* Optional idle float, OFF by default.
+   ---------------------------------------------------------------------------
+   Any continuously running animation makes Chrome drop LCD subpixel
+   antialiasing on non-opaque layers. This design has two of those (the
+   opacity-60 struck price and the opacity-50 faded star), so switching this on
+   very slightly changes how that text is rasterised — ~2,700 pixels across the
+   whole page, invisible in practice but not byte-identical to the Figma file.
+
+   With it off, the resting page is a pixel-for-pixel match to the design.
+
+   To turn it on, add the class "ix-idle" to <html> in index.html:
+       <html lang="en" class="ix-idle">
+   --------------------------------------------------------------------------- */
+@keyframes ix-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+.ix-idle [data-ix="fab"] {
+  animation: ix-float 4s ease-in-out infinite;
+}
+
+.ix-idle [data-ix="fab"]:hover,
+.ix-idle [data-ix="fab"]:active {
+  animation-play-state: paused;
+}
+
+[data-ix="fab"]:hover {
+  transform: scale(1.06);
+}
+
+[data-ix="fab"]:active {
+  transform: scale(0.95);
+}
+
+/* ---------- Accessibility: honour reduced-motion -------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  [data-ix],
+  [data-ix] *,
+  [data-ix-badge],
+  [data-ix-arrow] {
+    animation: none !important;
+    transition-duration: 1ms !important;
+  }
+
+  [data-ix]:hover,
+  [data-ix]:active,
+  [data-ix="card"]:hover [data-ix-media] img,
+  [data-ix="link"]:hover,
+  [data-ix="icon"]:hover ~ [data-ix-badge] {
+    transform: none !important;
+  }
+}
