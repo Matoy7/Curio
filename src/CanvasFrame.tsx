@@ -29,7 +29,15 @@ const MAX_SCALE = Infinity
 
 export default function CanvasFrame({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLDivElement>(null)
-  const [scale, setScale] = useState(1)
+
+  // Compute the scale during the FIRST render, not in an effect, so the very
+  // first paint is already full-width. Otherwise the canvas would paint once
+  // at 1442px (leaving white side margins) before being corrected.
+  const [scale, setScale] = useState(() =>
+    typeof document === 'undefined'
+      ? 1
+      : Math.min(MAX_SCALE, document.documentElement.clientWidth / DESIGN_WIDTH),
+  )
   const [contentHeight, setContentHeight] = useState(0)
 
   useLayoutEffect(() => {
