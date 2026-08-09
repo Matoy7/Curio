@@ -4,18 +4,28 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
  * The Figma artboard is 1442px wide. The generated design code uses fixed
  * pixel sizes and absolute positions that only line up at that exact width.
  *
- * This wrapper renders the design at its native 1442px and, when the viewport
- * is narrower, scales the whole canvas down uniformly with a CSS transform.
- * Because the scale is uniform, every proportion, position and dimension stays
- * exactly as designed - nothing is reflowed, re-wrapped or re-laid-out.
+ * This wrapper lays the design out at its native 1442px and then scales the
+ * whole canvas with a single uniform CSS transform so it always fills the full
+ * viewport width - scaling down on narrower screens and up on wider ones.
  *
- * The canvas is never scaled ABOVE 1, so on any display 1442px or wider the
- * page renders at a true 1:1 pixel ratio with the Figma file.
+ * Because the scale is uniform, every proportion, position and dimension stays
+ * exactly as designed - nothing is reflowed, re-wrapped or re-laid-out. The
+ * page is edge-to-edge at any window size, with no white side margins.
+ *
+ * Set MAX_SCALE below to cap how far the design is allowed to grow.
  *
  * Nothing inside src/imports/ is touched by this component.
  */
 
 const DESIGN_WIDTH = 1442
+
+/**
+ * Upper limit on how far the canvas may be scaled up.
+ * `Infinity` = always fill the full viewport width, edge to edge.
+ * Set to e.g. `1.5` to stop growing past 2163px, or `1` to render at a strict
+ * 1:1 pixel ratio and centre the canvas on wider screens.
+ */
+const MAX_SCALE = Infinity
 
 export default function CanvasFrame({ children }: { children: ReactNode }) {
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -30,7 +40,7 @@ export default function CanvasFrame({ children }: { children: ReactNode }) {
       // clientWidth excludes the vertical scrollbar, so the canvas never
       // triggers a horizontal scrollbar of its own.
       const viewportWidth = document.documentElement.clientWidth
-      setScale(Math.min(1, viewportWidth / DESIGN_WIDTH))
+      setScale(Math.min(MAX_SCALE, viewportWidth / DESIGN_WIDTH))
       // offsetHeight is unaffected by CSS transforms, so this is the true
       // untransformed layout height of the 1442px canvas.
       setContentHeight(canvas.offsetHeight)
