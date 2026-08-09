@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
+@import 'tailwindcss';
+
+
+@font-face {
+  font-family: 'Quicksand:Light';
+  src: local('Quicksand Light'), local('Quicksand-Light');
+  font-weight: 300;
+}
+@font-face {
+  font-family: 'Quicksand:Regular';
+  src: local('Quicksand Regular'), local('Quicksand-Regular');
+  font-weight: 400;
+}
+@font-face {
+  font-family: 'Quicksand:Medium';
+  src: local('Quicksand Medium'), local('Quicksand-Medium');
+  font-weight: 500;
+}
+@font-face {
+  font-family: 'Quicksand:SemiBold';
+  src: local('Quicksand SemiBold'), local('Quicksand-SemiBold');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Quicksand:Bold';
+  src: local('Quicksand Bold'), local('Quicksand-Bold');
+  font-weight: 700;
+}
+
+/* Map Figma-style font family aliases to Quicksand with correct weights */
+.font-\[\'Quicksand\:Light\'\,sans-serif\] { font-family: 'Quicksand', sans-serif !important; font-weight: 300 !important; }
+.font-\[\'Quicksand\:Regular\'\,sans-serif\] { font-family: 'Quicksand', sans-serif !important; font-weight: 400 !important; }
+.font-\[\'Quicksand\:Medium\'\,sans-serif\] { font-family: 'Quicksand', sans-serif !important; font-weight: 500 !important; }
+.font-\[\'Quicksand\:SemiBold\'\,sans-serif\] { font-family: 'Quicksand', sans-serif !important; font-weight: 600 !important; }
+.font-\[\'Quicksand\:Bold\'\,sans-serif\] { font-family: 'Quicksand', sans-serif !important; font-weight: 700 !important; }
+
+/* Inter italic fallback for quote marks */
+.font-\[\'Inter\:Italic\'\,sans-serif\] { font-family: 'Quicksand', sans-serif !important; font-style: italic !important; }
+.font-\[\'Inter\:Regular\'\,sans-serif\] { font-family: 'Quicksand', sans-serif !important; }
+
+/* ---------------------------------------------------------------
+   Production base layer.
+   Added for deployment only - does not affect the design canvas.
+   --------------------------------------------------------------- */
+
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+body {
+  background: #ffffff;
+  /* The canvas is scaled to fit, so nothing should ever bleed sideways. */
+  overflow-x: hidden;
+  /* Keep glyph rendering consistent with the Figma preview. */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
