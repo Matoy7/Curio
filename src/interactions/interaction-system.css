@@ -231,14 +231,23 @@
   transform: scale(1.035);
 }
 
-/* A card's own pill lights up with the card, without needing its own hover. */
-[data-ix="card"]:hover [data-ix="pill"] {
+/* A card's own pill lights up with the card, without needing its own hover.
+   ---------------------------------------------------------------------------
+   This is for the age and category cards, where the pill IS the card's label —
+   "2-4", "Problem Solving" — so lighting it with the card is correct.
+
+   Product cards are different: their pill is an "Add" button, a separate
+   control with its own destination. It must respond only to its own :hover,
+   never to the card's. The design marks those buttons data-name="button",
+   which is the same signal useInteractionLayer.ts uses to find them.
+   --------------------------------------------------------------------------- */
+[data-ix="card"]:hover [data-ix="pill"]:not([data-name="button"]) {
   background-color: var(--ix-fill);
   transform: none;
   box-shadow: none;
 }
 
-[data-ix="card"]:hover [data-ix="pill"] p {
+[data-ix="card"]:hover [data-ix="pill"]:not([data-name="button"]) p {
   color: var(--ix-on-fill);
 }
 
