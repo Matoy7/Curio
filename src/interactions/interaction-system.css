@@ -33,6 +33,9 @@
   --ix-on-fill: #e8f5f9;
   --ix-accent: #2a7ea7;
 
+  /* The Subscribe button's fill, reused as the Shop Now hover colour. */
+  --ix-cta-hover: #c5b266;
+
   /* Elevation + focus */
   --ix-shadow: 0 6px 18px -6px rgba(18, 36, 62, 0.28);
   --ix-shadow-card: 0 16px 32px -14px rgba(18, 36, 62, 0.32);
@@ -161,6 +164,13 @@
 [data-ix="button"]:active {
   transform: translateY(0) scale(var(--ix-press));
   box-shadow: none;
+}
+
+/* Shop Now shifts to the Subscribe button's gold on hover, so the site's two
+   primary CTAs resolve to the same colour when engaged. It is identified by
+   its own background class, which is exactly what this rule overrides. */
+[data-ix="button"][class*="bg-[#fbeaa7]"]:hover {
+  background-color: var(--ix-cta-hover);
 }
 
 /* ---------- Role: icon  (logo, search, cart, wishlist heart) -------------- */
